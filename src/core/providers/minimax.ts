@@ -2,8 +2,8 @@ import { CLAUDE_CODE } from "../../constants/agents.js";
 import type {
   BuiltinProvider,
   BuiltinProviderParams,
+  BuiltinProviderResponse,
 } from "../../types/builtin.js";
-import type { SubscribeResponse } from "../../types/provider.js";
 import { calculateObjectHash, cleanConfigString } from "../../utils/hash.js";
 
 /**
@@ -21,7 +21,7 @@ export const miniMaxProvider: BuiltinProvider = {
   requiresApiKey: true,
   apiKeyParam: "key",
 
-  handler: (params: BuiltinProviderParams): SubscribeResponse => {
+  handler: (params: BuiltinProviderParams): BuiltinProviderResponse => {
     const apiKey = params.params.get("key");
 
     if (!apiKey) {
@@ -49,7 +49,7 @@ export const miniMaxProvider: BuiltinProvider = {
 
     const claudeCodeHash = calculateObjectHash(claudeCodeSetting);
 
-    const response: SubscribeResponse = {
+    const response: BuiltinProviderResponse = {
       name: miniMaxProvider.name,
       description: miniMaxProvider.description,
       payload: {

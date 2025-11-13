@@ -1,5 +1,4 @@
-import type { BuiltinProvider, BuiltinProviderParams } from '../../types/builtin.js';
-import type { SubscribeResponse } from '../../types/provider.js';
+import type { BuiltinProvider, BuiltinProviderParams, BuiltinProviderResponse } from '../../types/builtin.js';
 import { calculateObjectHash } from '../../utils/hash.js';
 
 /**
@@ -16,7 +15,7 @@ export const openrouterProvider: BuiltinProvider = {
   requiresApiKey: true,
   apiKeyParam: 'key',
 
-  handler: (params: BuiltinProviderParams): SubscribeResponse => {
+  handler: (params: BuiltinProviderParams): BuiltinProviderResponse => {
     const apiKey = params.params.get('key');
 
     if (!apiKey) {
@@ -33,7 +32,7 @@ export const openrouterProvider: BuiltinProvider = {
 
     const claudeCodeHash = calculateObjectHash(claudeCodeSetting);
 
-    const response: SubscribeResponse = {
+    const response: BuiltinProviderResponse = {
       name: openrouterProvider.name,
       description: openrouterProvider.description,
       payload: {

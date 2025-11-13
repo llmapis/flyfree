@@ -47,16 +47,24 @@ Content-Type: application/json; charset=utf-8
 
 ```typescript
 {
-  "name": string,           // Provider 名称（必需）
-  "payload": {              // 配置内容（必需）
-    "providers": [          // Agent 配置列表（必需，至少一个）
-      {
-        "name": string,     // Agent 名称（必需）
-        "hash": string,     // 配置哈希值（必需）
-        "setting": object   // Agent 配置内容（必需）
-      }
-    ],
-    "functions": string[]   // 支持的功能列表（必需，可为空数组）
+  "meta": {                  // 响应元数据（必需）
+    "request_id": string,   // 请求ID（必需）
+    "code": number,         // 错误码（必需）
+    "message": string       // 错误信息（必需）
+  },
+  "data": {                  // 响应数据（必需）
+    "name": string,         // Provider 名称（必需）
+    "description": string,  // Provider 描述（可选）
+    "payload": {            // 配置内容（必需）
+      "providers": [        // Agent 配置列表（必需，至少一个）
+        {
+          "name": string,   // Agent 名称（必需）
+          "hash": string,   // 配置哈希值（必需）
+          "setting": object // Agent 配置内容（必需）
+        }
+      ],
+      "functions": string[] // 支持的功能列表（必需，可为空数组）
+    }
   }
 }
 ```
@@ -65,6 +73,28 @@ Content-Type: application/json; charset=utf-8
 
 ### 顶层字段
 
+#### `meta` (object, 必需)
+
+响应的元数据信息，包含请求ID、错误码和错误信息。
+
+- **`request_id`** (string, 必需) - 请求唯一标识符
+  - 用于追踪和调试请求
+  - 建议 UUID 格式或类似的唯一字符串
+
+- **`code`** (number, 必需) - 错误码
+  - 成功时：`200`
+  - 失败时：相应的错误码，如 `400`, `401`, `403`, `404`, `500` 等
+
+- **`message`** (string, 必需) - 错误信息
+  - 成功时：空字符串
+  - 失败时：具体的错误描述信息
+
+#### `data` (object, 必需)
+
+包含实际响应数据的对象。
+
+### data 字段
+
 #### `name` (string, 必需)
 
 Provider 的名称，用于标识和显示。
@@ -72,6 +102,10 @@ Provider 的名称，用于标识和显示。
 - 格式：字母、数字、连字符、下划线
 - 长度：1-50 个字符
 - 示例：`"my-llm-provider"`, `"openai_compatible"`
+
+#### `description` (string, 可选)
+
+Provider 的描述信息。
 
 #### `payload` (object, 必需)
 
@@ -111,74 +145,138 @@ Provider 支持的扩展功能列表。
 
 ## 完整示例
 
-### 示例 1: 单个 Agent
+### 示例 1: 单个 Agent（成功响应）
 
 ```json
 {
-  "name": "my-provider",
-  "payload": {
-    "providers": [
-      {
-        "name": "claude-code",
-        "hash": "abc123def456...",
-        "setting": {
-          "apiKey": "your-api-key",
-          "baseURL": "https://api.example.com",
-          "model": "claude-3-5-sonnet-20241022",
-          "maxTokens": 4096
+  "meta": {
+    "request_id": "req-123456789-abcde",
+    "code": 200,
+    "message": ""
+  },
+  "data": {
+    "name": "my-provider",
+    "description": "My LLM Provider",
+    "payload": {
+      "providers": [
+        {
+          "name": "claude-code",
+          "hash": "abc123def456...",
+          "setting": {
+            "apiKey": "your-api-key",
+            "baseURL": "https://api.example.com",
+            "model": "claude-3-5-sonnet-20241022",
+            "maxTokens": 4096
+          }
         }
-      }
-    ],
-    "functions": ["balance", "usage"]
+      ],
+      "functions": ["balance", "usage"]
+    }
   }
 }
 ```
 
-### 示例 2: 多个 Agents
+### 示例 2: 多个 Agents（成功响应）
 
 ```json
 {
-  "name": "multi-agent-provider",
-  "payload": {
-    "providers": [
-      {
-        "name": "claude-code",
-        "hash": "hash1",
-        "setting": {
-          "apiKey": "claude-key",
-          "baseURL": "https://api.anthropic.com"
+  "meta": {
+    "request_id": "req-987654321-fghij",
+    "code": 200,
+    "message": ""
+  },
+  "data": {
+    "name": "multi-agent-provider",
+    "description": "Multi-agent LLM Provider",
+    "payload": {
+      "providers": [
+        {
+          "name": "claude-code",
+          "hash": "hash1",
+          "setting": {
+            "apiKey": "claude-key",
+            "baseURL": "https://api.anthropic.com"
+          }
+        },
+        {
+          "name": "codex",
+          "hash": "hash2",
+          "setting": {
+            "apiKey": "openai-key",
+            "model": "gpt-4"
+          }
         }
-      },
-      {
-        "name": "codex",
-        "hash": "hash2",
-        "setting": {
-          "apiKey": "openai-key",
-          "model": "gpt-4"
-        }
-      }
-    ],
-    "functions": ["balance"]
+      ],
+      "functions": ["balance"]
+    }
   }
 }
 ```
 
-### 示例 3: 最小配置
+### 示例 3: 最小配置（成功响应）
 
 ```json
 {
-  "name": "minimal-provider",
-  "payload": {
-    "providers": [
-      {
-        "name": "claude-code",
-        "hash": "simple-hash",
-        "setting": {
-          "apiKey": "sk-xxx"
+  "meta": {
+    "request_id": "req-minimal-001",
+    "code": 200,
+    "message": ""
+  },
+  "data": {
+    "name": "minimal-provider",
+    "description": "",
+    "payload": {
+      "providers": [
+        {
+          "name": "claude-code",
+          "hash": "simple-hash",
+          "setting": {
+            "apiKey": "sk-xxx"
+          }
         }
-      }
-    ],
-    "functions": []
+      ],
+      "functions": []
+    }
+  }
+}
+```
+
+### 示例 4: 错误响应
+
+```json
+{
+  "meta": {
+    "request_id": "req-error-401",
+    "code": 401,
+    "message": "API key is invalid or expired"
+  },
+  "data": {
+    "name": "",
+    "description": "",
+    "payload": {
+      "providers": [],
+      "functions": []
+    }
+  }
+}
+```
+
+### 示例 5: 订阅令牌无效错误
+
+```json
+{
+  "meta": {
+    "request_id": "req-error-403",
+    "code": 403,
+    "message": "The subscription token is invalid or has expired"
+  },
+  "data": {
+    "name": "",
+    "description": "",
+    "payload": {
+      "providers": [],
+      "functions": []
+    }
   }
 }
 ```
@@ -219,31 +317,37 @@ Provider 支持的扩展功能列表。
 
 ## 错误响应
 
-当发生错误时，建议返回以下格式：
+当发生错误时，Provider 应该返回以下格式：
 
 ```json
 {
-  "error": {
-    "code": "error_code",
-    "message": "Human-readable error message",
-    "details": {}
-  }
-}
-```
-
-示例：
-
-```json
-{
-  "error": {
-    "code": "invalid_token",
-    "message": "The subscription token is invalid or expired",
-    "details": {
-      "expires_at": 1234567890
+  "meta": {
+    "request_id": "请求ID",
+    "code": 400,
+    "message": "错误描述信息"
+  },
+  "data": {
+    "name": "",
+    "description": "",
+    "payload": {
+      "providers": [],
+      "functions": []
     }
   }
 }
 ```
+
+常见错误码：
+
+- **400** - Bad Request：请求参数错误
+- **401** - Unauthorized：API Key 无效或缺失
+- **403** - Forbidden：权限不足或订阅令牌无效
+- **404** - Not Found：订阅 URL 不存在
+- **429** - Too Many Requests：请求过于频繁
+- **500** - Internal Server Error：服务器内部错误
+- **503** - Service Unavailable：服务暂时不可用
+
+注意：即使发生错误，也要返回完整的 JSON 结构，`data` 部分可以返回空值或默认值。
 
 ## 安全建议
 
@@ -277,35 +381,52 @@ Flyfree 使用 JSON Schema 验证响应格式。完整的 schema 定义：
 {
   type: 'object',
   properties: {
-    name: { type: 'string', minLength: 1 },
-    payload: {
+    meta: {
       type: 'object',
       properties: {
-        providers: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string', minLength: 1 },
-              hash: { type: 'string', minLength: 1 },
-              setting: { type: 'object' }
+        request_id: { type: 'string', minLength: 1 },
+        code: { type: 'number' },
+        message: { type: 'string' }
+      },
+      required: ['request_id', 'code', 'message'],
+      additionalProperties: false
+    },
+    data: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', minLength: 1 },
+        description: { type: 'string' },
+        payload: {
+          type: 'object',
+          properties: {
+            providers: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', minLength: 1 },
+                  hash: { type: 'string', minLength: 1 },
+                  setting: { type: 'object' }
+                },
+                required: ['name', 'hash', 'setting']
+              },
+              minItems: 1
             },
-            required: ['name', 'hash', 'setting']
+            functions: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['balance', 'usage']
+              }
+            }
           },
-          minItems: 1
-        },
-        functions: {
-          type: 'array',
-          items: {
-            type: 'string',
-            enum: ['balance', 'usage']
-          }
+          required: ['providers', 'functions']
         }
       },
-      required: ['providers', 'functions']
+      required: ['name', 'payload']
     }
   },
-  required: ['name', 'payload']
+  required: ['meta', 'data']
 }
 ```
 
@@ -313,29 +434,38 @@ Flyfree 使用 JSON Schema 验证响应格式。完整的 schema 定义：
 
 Provider 实现时请确认：
 
-- [ ] 响应状态码为 200
+- [ ] 响应状态码为 200（成功）或相应的错误状态码
 - [ ] Content-Type 为 application/json
-- [ ] 包含必需字段：name, payload
-- [ ] payload.providers 至少包含一个 agent
+- [ ] 包含必需字段：meta, data
+- [ ] meta 包含 request_id、code 和 message 字段
+- [ ] data 包含 name, description, payload 字段
+- [ ] data.payload.providers 至少包含一个 agent
 - [ ] 每个 agent 包含 name, hash, setting
 - [ ] functions 字段存在（可以为空数组）
-- [ ] 所有字符串字段非空
+- [ ] 所有字符串字段符合格式要求
 - [ ] setting 是有效的 JSON 对象
+- [ ] 错误时也要返回完整的 JSON 结构
 - [ ] 使用 HTTPS
 - [ ] 实现访问控制
 - [ ] 响应时间 < 5 秒
 
 ## 版本兼容性
 
-### 当前版本 (v1.0)
+### 当前版本 (v1.1)
 
 - 支持 `balance` 和 `usage` functions
 - 基础的订阅和配置应用
+- 新增错误处理机制（meta 字段包含错误码和错误信息）
+
+### 历史版本
+
+#### v1.0 (2025-11-12)
+- 初始版本，支持基本的订阅协议
 
 ### 未来版本计划
 
-- v1.1: 支持配置加密
-- v1.2: 支持增量更新
+- v1.2: 支持配置加密
+- v1.3: 支持增量更新
 - v2.0: 支持更多 functions
 
 ## 联系方式
@@ -347,4 +477,5 @@ Provider 实现时请确认：
 
 ## 更新日志
 
+- 2025-11-13: v1.1 新增错误处理机制，响应格式改为 meta + data 结构
 - 2025-11-12: v1.0 初始版本

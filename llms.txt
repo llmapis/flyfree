@@ -1,0 +1,527 @@
+# Flyfree Provider Integration Guide
+
+## OVERVIEW
+
+To become a Flyfree provider, you need to implement **one HTTP endpoint** that returns a JSON configuration. Users can then subscribe to your service using `ff sub <your-url>`.
+
+## CORE REQUIREMENT: Implement a getConfig Endpoint
+
+Implement a single HTTP endpoint (like `getConfig`) that returns a fixed JSON structure.
+
+### Endpoint Specification
+- **Method**: GET
+- **Protocol**: HTTPS required
+- **Response**: JSON
+
+### JSON Response Format
+```json
+{
+  "name": "your-provider-name",
+  "description": "Your provider description",
+  "payload": {
+    "providers": [
+      {
+        "name": "claude-code",
+        "hash": "unique-config-hash",
+        "setting": {
+          "env": {
+            "ANTHROPIC_AUTH_TOKEN": "sk-your-api-key",
+            "ANTHROPIC_BASE_URL": "https://api.your-provider.com"
+          }
+        }
+      }
+    ],
+    "functions": ["balance", "usage"]
+  }
+}
+```
+
+### Field Descriptions
+- **name**: Provider name (visible to users)
+- **description**: Provider description
+- **payload.providers**: Array of supported AI agent configurations
+  - **name**: Agent name (currently supports: claude-code)
+  - **hash**: Unique configuration identifier (any string)
+  - **setting**: Agent-specific configuration
+    - **env**: Environment variables to set
+- **functions**: Optional feature list (e.g., ["balance", "usage"])
+
+## SIMPLE IMPLEMENTATION
+
+### Node.js Example
+```javascript
+const express = require('express');
+const app = express();
+
+// Single getConfig endpoint
+app.get('/getConfig', (req, res) => {
+  const userApiKey = req.query.key || 'default-key';
+
+  res.json({
+    name: "my-provider",
+    description: "My LLM Service",
+    payload: {
+      providers: [
+        {
+          name: "claude-code",
+          hash: "config-" + userApiKey.slice(-8),
+          setting: {
+            env: {
+              ANTHROPIC_AUTH_TOKEN: userApiKey,
+              ANTHROPIC_BASE_URL: "https://api.example.com"
+            }
+          }
+        }
+      ],
+      functions: ["balance", "usage"]
+    }
+  });
+});
+
+app.listen(3000);
+```
+
+### Python Example
+```python
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+@app.route('/getConfig')
+def getConfig():
+    user_key = request.args.get('key', 'default-key')
+
+    return jsonify({
+        "name": "my-provider",
+        "description": "My LLM Service",
+        "payload": {
+            "providers": [
+                {
+                    "name": "claude-code",
+                    "hash": f"config-{user_key[-8:]}",
+                    "setting": {
+                        "env": {
+                            "ANTHROPIC_AUTH_TOKEN": user_key,
+                            "ANTHROPIC_BASE_URL": "https://api.example.com"
+                        }
+                    }
+                }
+            ],
+            "functions": ["balance", "usage"]
+        }
+    })
+
+if __name__ == '__main__':
+    app.run(port=3000)
+```
+
+## BUILT-IN PROVIDER (Optional)
+
+For popular services, you can become a built-in provider using the `ff://` protocol. This requires submitting a Pull Request to the Flyfree GitHub repository.
+
+### Repository: https://github.com/llmapis/flyfree
+
+Users would then subscribe with: `ff sub 'ff://your-provider?key=API_KEY'`
+
+### 4. GitHub Integration Process
+
+#### Submitting Built-in Provider
+
+To become a built-in provider, submit a Pull Request to the Flyfree repository:
+
+**Repository**: https://github.com/llmapis/flyfree
+
+#### Submission Steps
+
+1. **Fork Repository**
+   ```bash
+   # Clone your fork
+   git clone https://github.com/YOUR_USERNAME/flyfree.git
+   cd flyfree
+   ```
+
+2. **Create Feature Branch**
+   ```bash
+   git checkout -b add-provider-provider-name
+   ```
+
+3. **Implement Provider Code**
+   - Create file: `src/core/providers/provider-name.ts`
+   - Implement handler function following the pattern above
+
+4. **Register Provider**
+   ```typescript
+   // src/core/builtin-providers.ts
+   import { handleProviderName } from './providers/provider-name';
+
+   builtinProviders.register({
+     id: "provider-name",
+     name: "Human Readable Name",
+     description: "Provider description",
+     requiresApiKey: true,
+     apiKeyParam: "key",
+     handler: handleProviderName
+   });
+   ```
+
+5. **Update Documentation**
+   - Add provider info to `docs/BUILTIN_PROVIDERS.md`
+   - Update provider list in `README.md`
+
+6. **Add Tests**
+   ```typescript
+   // tests/providers/provider-name.test.ts
+   describe('ProviderName', () => {
+     // Test cases for your provider
+   });
+   ```
+
+7. **Submit Pull Request**
+   ```bash
+   git add .
+   git commit -m "feat: add provider-name builtin provider"
+   git push origin add-provider-provider-name
+   ```
+   Create PR targeting `llmapis/flyfree` `main` branch
+
+#### PR Requirements
+
+**Code Quality:**
+- Follow TypeScript project conventions
+- Include comprehensive error handling
+- Add JSDoc comments for public functions
+
+**Testing:**
+- Unit tests for provider logic
+- Integration tests with Flyfree CLI
+- Coverage for edge cases and error scenarios
+
+**Documentation:**
+- Complete usage examples
+- Parameter descriptions
+- Error condition documentation
+
+**Validation:**
+- All existing tests must pass
+- New provider must pass schema validation
+- CLI integration must work correctly
+
+#### Review Process
+
+1. **Automated Checks**
+   - Code linting and formatting
+   - Test suite execution
+   - Type checking
+
+2. **Manual Review**
+   - Code quality assessment
+   - Security review
+   - Documentation completeness
+
+3. **Integration Testing**
+   - Test with actual Flyfree CLI
+   - Verify configuration application
+   - Check error handling
+
+4. **Approval and Merge**
+   - Maintainer approval required
+   - Squash merge for clean history
+   - Release in next version
+
+#### Post-Merge
+
+- Provider becomes available in next Flyfree release
+- Users can subscribe with: `ff sub 'ff://provider-name?key=API_KEY'`
+- Provider appears in built-in provider listings
+- Documentation becomes official project documentation
+
+## TECHNICAL REQUIREMENTS
+
+### 1. HTTP Provider Requirements
+
+#### Protocol
+- HTTPS required (no HTTP)
+- HTTP/1.1 or HTTP/2 supported
+- JSON responses only
+
+#### Performance
+- Response time: < 5 seconds recommended
+- Payload size: < 1MB recommended
+- Rate limiting: Recommended for production
+
+#### Security
+- API key validation (if applicable)
+- Input sanitization
+- HTTPS/TLS 1.2+ required
+- CORS headers as needed
+
+#### Error Handling
+```json
+{
+  "error": "error-message",
+  "code": "ERROR_CODE",
+  "details": {/* optional additional info */}
+}
+```
+
+HTTP Status Codes:
+- 200: Success
+- 400: Bad request
+- 401: Unauthorized
+- 404: Not found
+- 429: Rate limited
+- 500: Internal server error
+
+### 2. Configuration Validation
+
+Flyfree validates responses using JSON Schema. Key validation rules:
+- Required fields must be present
+- Hash values must be valid strings
+- Configuration settings must pass agent-specific validation
+
+### 3. Hash Calculation
+
+Hash values should uniquely identify configurations:
+- Use SHA-256 algorithm
+- Include all configuration parameters
+- Exclude timestamp or dynamic values
+- Base64 encode result
+
+```typescript
+import { createHash } from 'crypto';
+
+function calculateConfigHash(config: any): string {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(config));
+  return hash.digest('base64');
+}
+```
+
+## INTEGRATION EXAMPLES
+
+### 1. Minimal HTTP Provider (Node.js)
+
+```javascript
+const express = require('express');
+const crypto = require('crypto');
+
+const app = express();
+
+app.get('/config', (req, res) => {
+  const apiKey = req.query.key;
+
+  if (!apiKey || !apiKey.startsWith('sk-')) {
+    return res.status(401).json({
+      error: 'Valid API key required'
+    });
+  }
+
+  const config = {
+    env: {
+      ANTHROPIC_AUTH_TOKEN: apiKey,
+      ANTHROPIC_BASE_URL: 'https://api.example.com/v1'
+    }
+  };
+
+  const hash = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(config))
+    .digest('base64');
+
+  res.json({
+    name: "example-provider",
+    description: "Example LLM Provider",
+    payload: {
+      providers: [{
+        name: "claude-code",
+        hash: hash,
+        setting: config
+      }],
+      functions: ["balance", "usage"]
+    }
+  });
+});
+
+app.listen(443);
+```
+
+### 2. Built-in Provider (TypeScript)
+
+```typescript
+// src/core/providers/my-provider.ts
+import {
+  BuiltinProviderParams,
+  SubscribeResponse
+} from '../types';
+import { calculateObjectHash } from '../utils/hash';
+
+export function handleMyProvider(
+  params: BuiltinProviderParams
+): SubscribeResponse {
+  const apiKey = params.params.get("key");
+  const model = params.params.get("model") || "claude-3-5-sonnet";
+
+  if (!apiKey) {
+    throw new Error("API key is required");
+  }
+
+  const config = {
+    env: {
+      ANTHROPIC_AUTH_TOKEN: apiKey,
+      ANTHROPIC_BASE_URL: "https://api.myprovider.com/anthropic",
+      ANTHROPIC_MODEL: model
+    },
+    timeout: 120000
+  };
+
+  return {
+    name: "MyProvider",
+    description: "Custom LLM Provider",
+    payload: {
+      providers: [{
+        name: "claude-code",
+        hash: calculateObjectHash(config),
+        setting: config
+      }],
+      functions: ["balance", "usage", "models"]
+    }
+  };
+}
+```
+
+### 3. Multi-Agent Provider
+
+```json
+{
+  "name": "multi-agent-provider",
+  "description": "Supports multiple AI coding agents",
+  "payload": {
+    "providers": [
+      {
+        "name": "claude-code",
+        "hash": "claude-config-123",
+        "setting": {
+          "env": {
+            "ANTHROPIC_AUTH_TOKEN": "sk-claude-key",
+            "ANTHROPIC_BASE_URL": "https://api.provider.com/anthropic"
+          }
+        }
+      }
+      // Future: Add support for other agents
+    ],
+    "functions": ["balance", "usage"]
+  }
+}
+```
+
+## SUBSCRIPTION WORKFLOW
+
+### 1. User Subscription
+```bash
+# External provider
+ff sub https://provider.com/config -a myprovider
+
+# Built-in provider
+ff sub 'ff://myprovider?key=API_KEY' -a myprovider
+
+# With auto-apply
+ff sub https://provider.com/config -a myprovider --auto
+```
+
+### 2. Configuration Storage
+```
+~/.ff/
+├── sub.json              # Subscription metadata
+└── myprovider/
+    ├── config.json       # Provider info
+    └── claude-code/
+        └── config.json   # Agent configuration
+```
+
+### 3. Configuration Application
+- Backup created before changes
+- Hash validation for change detection
+- Interactive confirmation (unless --auto flag)
+- Agent-specific configuration file updates
+
+## ADVANCED FEATURES
+
+### 1. Provider Functions
+Optional functions providers can expose:
+- `balance`: Account balance checking
+- `usage`: Usage statistics
+- `models`: Available model listing
+
+### 2. Configuration Updates
+Providers should:
+- Generate new hash for configuration changes
+- Return updated timestamp
+- Handle incremental updates efficiently
+
+### 3. Error Recovery
+Implement retry logic for:
+- Network timeouts
+- Temporary server errors
+- Rate limit responses
+
+## TESTING GUIDELINES
+
+### 1. Local Testing
+```bash
+# Test with debug mode
+DEBUG=1 ff sub http://localhost:3000/config -a test
+
+# Validate response format
+curl -s https://provider.com/config | jq .
+```
+
+### 2. Integration Testing
+Test scenarios:
+- Valid API key
+- Invalid API key
+- Missing parameters
+- Network errors
+- Malformed JSON
+
+### 3. Performance Testing
+- Load testing with concurrent requests
+- Response time measurement
+- Memory usage monitoring
+
+## SECURITY CONSIDERATIONS
+
+### 1. API Key Management
+- Never store raw API keys in logs
+- Implement key rotation support
+- Use secure key transmission
+
+### 2. Input Validation
+- Sanitize all input parameters
+- Validate JSON structure
+- Prevent injection attacks
+
+### 3. Rate Limiting
+- Implement request throttling
+- Consider API key-based limits
+- Monitor for abuse patterns
+
+## FUTURE COMPATIBILITY
+
+Flyfree is designed for extensibility:
+- New agent support via path mapping
+- Additional configuration formats
+- Enhanced security features
+- Usage tracking integration
+
+Providers implementing the current protocol will be compatible with future versions without breaking changes.
+
+## SUPPORT
+
+Technical support available at:
+- GitHub Issues: https://github.com/llmapis/flyfree/issues
+- Documentation: https://github.com/llmapis/flyfree/docs
+
+## VERSION
+
+Current protocol version: 1.0
+Compatible with Flyfree CLI version: 1.x.x

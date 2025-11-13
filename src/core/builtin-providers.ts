@@ -1,4 +1,4 @@
-import type { BuiltinProvider } from "../types/builtin.js";
+import type { BuiltinProvider, BuiltinProviderResponse } from "../types/builtin.js";
 import type { SubscribeResponse } from "../types/provider.js";
 import {
   zaiProvider,
@@ -114,5 +114,17 @@ export async function handleBuiltinProvider(
     url,
   });
 
-  return response;
+  // 包装为新的响应格式
+  return {
+    meta: {
+      request_id: crypto.randomUUID(),
+      code: 200,
+      message: "",
+    },
+    data: {
+      name: response.name,
+      description: response.description,
+      payload: response.payload,
+    },
+  };
 }

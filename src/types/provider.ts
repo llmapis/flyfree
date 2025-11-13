@@ -42,12 +42,35 @@ export interface ProviderConfig {
 }
 
 /**
- * 订阅 URL 的响应格式
+ * 订阅响应的元数据信息
  */
-export interface SubscribeResponse {
+export interface SubscribeResponseMeta {
+  /** 请求ID */
+  request_id: string;
+  /** 错误码 */
+  code: number;
+  /** 错误信息 */
+  message: string;
+}
+
+/**
+ * 订阅响应的数据部分
+ */
+export interface SubscribeResponseData {
   /** 供应商名称 */
   name: string;
+  /** 供应商描述 */
   description: string;
   /** 配置内容 */
   payload: ProviderPayload;
+}
+
+/**
+ * 订阅 URL 的响应格式
+ */
+export interface SubscribeResponse {
+  /** 响应元数据（包含错误信息） */
+  meta: SubscribeResponseMeta;
+  /** 响应数据 */
+  data: SubscribeResponseData;
 }

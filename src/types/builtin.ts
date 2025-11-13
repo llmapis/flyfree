@@ -1,4 +1,16 @@
-import type { SubscribeResponse } from './provider.js';
+import type { ProviderPayload } from './provider.js';
+
+/**
+ * 内置 Provider 的响应格式（旧格式，用于向后兼容）
+ */
+export interface BuiltinProviderResponse {
+  /** 供应商名称 */
+  name: string;
+  /** 供应商描述 */
+  description: string;
+  /** 配置内容 */
+  payload: ProviderPayload;
+}
 
 /**
  * 内置 Provider 处理函数的参数
@@ -15,7 +27,7 @@ export interface BuiltinProviderParams {
  */
 export type BuiltinProviderHandler = (
   params: BuiltinProviderParams
-) => SubscribeResponse | Promise<SubscribeResponse>;
+) => BuiltinProviderResponse | Promise<BuiltinProviderResponse>;
 
 /**
  * 内置 Provider 定义

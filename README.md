@@ -7,7 +7,7 @@ Flyfree (自由翱翔) helps you easily manage and switch between different LLM 
 ## 📖 Documentation
 
 - 📑 **[Project Overview & Features](docs/FEATURED.md)** - Comprehensive project introduction
-- 📘 **[User Guide](docs/USER_GUIDE.md)** - Complete usage documentation  
+- 📘 **[User Guide](docs/USER_GUIDE.md)** - Complete usage documentation
 - ⚡ **[Quick Reference](docs/QUICK_REFERENCE.md)** - Command cheat sheet
 - 🔌 **[Built-in Providers](docs/BUILTIN_PROVIDERS.md)** - Internal provider system guide
 
@@ -93,13 +93,16 @@ ff unsub myProvider --force
 Subscribe to a provider configuration.
 
 **Arguments:**
+
 - `url` - The subscription URL
 
 **Options:**
+
 - `-a, --alias <name>` - Set provider alias name
 - `--auto` - Automatically apply configuration without confirmation
 
 **Example:**
+
 ```bash
 ff sub https://example.com/config -a myProvider --auto
 ```
@@ -109,6 +112,7 @@ ff sub https://example.com/config -a myProvider --auto
 List all subscribed providers and their status.
 
 This command displays:
+
 - All subscribed providers
 - Subscription status (success/failed/pending)
 - Last update time
@@ -116,6 +120,7 @@ This command displays:
 - Currently active configurations
 
 **Example:**
+
 ```bash
 ff list
 ```
@@ -125,6 +130,7 @@ ff list
 Interactively switch between provider configurations.
 
 This command will:
+
 1. Display all subscribed providers
 2. Let you select a provider
 3. Show available agents for that provider
@@ -135,10 +141,12 @@ This command will:
 Quickly switch agent provider configuration.
 
 **Arguments:**
+
 - `agent` - The agent name to switch
 - `provider` - The target provider name
 
 **Example:**
+
 ```bash
 # Switch claude-code to use ZhiPu provider
 ff set claude-code ZhiPu
@@ -152,12 +160,15 @@ ff set claude-code OpenRouter
 Reset agent configurations to empty state.
 
 **Arguments:**
+
 - `agent` - The agent name to reset (optional, will show interactive selection)
 
 **Options:**
+
 - `-f, --force` - Force reset without confirmation
 
 **Example:**
+
 ```bash
 # Interactive selection of agents to reset
 ff reset
@@ -174,12 +185,15 @@ ff reset claude-code --force
 Restore agent configurations from backups.
 
 **Arguments:**
+
 - `agent` - The agent name to restore (optional, will show interactive selection)
 
 **Options:**
+
 - `-l, --list` - List all available backups
 
 **Example:**
+
 ```bash
 # List all backups
 ff restore --list
@@ -196,12 +210,15 @@ ff restore claude-code
 Unsubscribe from a provider.
 
 **Arguments:**
+
 - `provider` - The provider name to unsubscribe
 
 **Options:**
+
 - `-f, --force` - Force unsubscribe without confirmation
 
 **Example:**
+
 ```bash
 # With confirmation
 ff unsub myProvider
@@ -211,6 +228,7 @@ ff unsub myProvider --force
 ```
 
 **Note:** Unsubscribing will:
+
 - Remove the provider configuration from `~/.ff/`
 - Clear the provider from subscription list
 - Clear affected agent settings
@@ -222,7 +240,7 @@ Flyfree includes built-in provider support using the `ff://` protocol. These pro
 
 ### Available Built-in Providers
 
-#### 1. Z.AI (智谱AI)
+#### 1. Z.AI (智谱 AI)
 
 Subscribe to ZhiPu AI's API with Claude Code support:
 
@@ -231,6 +249,7 @@ ff sub 'ff://z.ai?key=YOUR_API_KEY' -a zhipu --auto
 ```
 
 Supported agents:
+
 - **claude-code**: Claude 3.5 Sonnet via ZhiPu's Anthropic-compatible endpoint
 - **codex**: GPT-4 via ZhiPu's OpenAI-compatible endpoint
 
@@ -243,6 +262,7 @@ ff sub 'ff://openrouter?key=YOUR_API_KEY' -a openrouter --auto
 ```
 
 Supported agents:
+
 - **claude-code**: Anthropic Claude 3.5 Sonnet via OpenRouter
 
 ### Adding Custom Built-in Providers
@@ -251,35 +271,36 @@ You can extend the built-in provider system by registering new providers in [src
 
 ```typescript
 builtinProviders.register({
-  id: 'my-provider',
-  name: 'My Custom Provider',
-  description: 'My custom provider description',
+  id: "my-provider",
+  name: "My Custom Provider",
+  description: "My custom provider description",
   requiresApiKey: true,
-  apiKeyParam: 'key',
+  apiKeyParam: "key",
 
   handler: (params: BuiltinProviderParams): SubscribeResponse => {
-    const apiKey = params.params.get('key');
+    const apiKey = params.params.get("key");
 
     if (!apiKey) {
-      throw new Error('API key is required');
+      throw new Error("API key is required");
     }
 
     return {
-      name: 'My Custom Provider',
+      name: "My Custom Provider",
+      description: "Provider description",
       payload: {
         providers: [
           {
-            name: 'claude-code',
+            name: "claude-code",
             hash: calculateObjectHash(setting),
             setting: {
               // Your configuration here
-            }
-          }
+            },
+          },
         ],
-        functions: []
-      }
+        functions: [],
+      },
     };
-  }
+  },
 });
 ```
 
@@ -329,20 +350,28 @@ Providers should return a JSON response with the following structure:
 
 ```json
 {
-  "name": "provider-name",
-  "payload": {
-    "providers": [
-      {
-        "name": "claude-code",
-        "hash": "config-hash",
-        "setting": {
-          // Agent-specific configuration
+  "meta": {
+    "code": "error code",
+    "error": "error message"
+  },
+  "data": {
+    "name": "provider-name",
+    "description": "provider description",
+    "payload": {
+      "providers": [
+        {
+          "name": "claude-code",
+          "hash": "config-hash",
+          "setting": {
+            // Agent-specific configuration
+          }
         }
-      }
-    ],
-    "functions": ["balance", "usage"]
+      ],
+      "functions": ["balance", "usage"]
+    }
   }
 }
+
 ```
 
 See [docs/protocol.md](docs/protocol.md) for detailed protocol specification.
@@ -350,6 +379,7 @@ See [docs/protocol.md](docs/protocol.md) for detailed protocol specification.
 ## Supported Agents
 
 Currently supported agents:
+
 - **Claude Code** (`~/.claude/settings.json`)
 
 You can add more agents by editing the path mapping in the source code.
@@ -362,7 +392,7 @@ You can add more agents by editing the path mapping in the source code.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/flyfree.git
+git clone https://github.com/llmapis/flyfree.git
 cd flyfree
 
 # Install dependencies
@@ -429,6 +459,7 @@ If you see this warning, it means the agent is not yet configured in Flyfree. Yo
 ### Subscription failed
 
 Common causes:
+
 - Invalid URL or network issues
 - Invalid JSON response format
 - Server timeout
