@@ -1,6 +1,6 @@
 {
   "name": "flyfree",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A CLI tool for managing LLM Provider configurations for AI agents like Claude Code and Codex",
   "main": "dist/index.js",
   "bin": {
