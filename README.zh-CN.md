@@ -7,7 +7,7 @@
 > 用于管理 AI 代理（如 Claude Code 和 Codex）LLM 提供商配置的 CLI 工具
 
 Flyfree（自由飞翔）帮助您轻松管理和切换多个 AI Agent 的不同 LLM 提供商配置。它充当用户与 LLM 平台之间的桥梁，实现无缝配置管理和快速平台集成。
-Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化了 LLM 供应商的接入文档。
+Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化了 LLM 供应商描向用户描述的接入文档。
 
 ## 使用 Flyfree 前后对比
 
@@ -15,11 +15,7 @@ Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化
 
 以 MiniMax 集成 Codex CLI 为例，用户需要：
 
-1. **安装 Codex CLI**
-
-   ```bash
-   npm i -g @openai/codex
-   ```
+1. 了解 Codex CLI 的配置存储路径，掌握 Codex CLI 的配置格式。
 
 2. **手动创建并配置配置文件** `~/.codex/config.toml`：
 
@@ -39,7 +35,7 @@ Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化
    model_provider = "minimax"
    ```
 
-3. **手动设置环境变量**
+3. **认真阅读文档才发现需要手动设置环境变量**
 
    ```bash
    export MINIMAX_API_KEY="<YOUR_API_KEY>"
@@ -67,6 +63,9 @@ npm i -g @llmapis/flyfree
 
 # 2. 订阅并自动应用
 ff sub 'ff://minimax?key={YOUR_MINIMAX_API_KEY}' --auto
+
+# 3. 启动 codex
+codex
 ```
 
 **优势：**

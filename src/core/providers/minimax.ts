@@ -49,6 +49,9 @@ export const miniMaxProvider: BuiltinProvider = {
     `);
 
     const codexSetting = cleanConfigString(`
+model_provider = "minimax"
+model = "codex-MiniMax-M2"
+
 [model_providers.minimax]
 name = "MiniMax Chat Completions API"
 base_url = "https://api.minimax.io/v1"
@@ -58,10 +61,6 @@ requires_openai_auth = false
 request_max_retries = 4
 stream_max_retries = 10
 stream_idle_timeout_ms = 300000
-
-[profiles.m2]
-model = "codex-MiniMax-M2"
-model_provider = "minimax"
       `);
 
     const response: BuiltinProviderResponse = {

@@ -14,12 +14,10 @@ Flyfree (自由飞翔) helps you easily manage and switch between different LLM 
 
 Taking MiniMax integration with Codex CLI as an example, users need to:
 
-1. **Install Codex CLI**
-   ```bash
-   npm i -g @openai/codex
-   ```
+1. Understand Codex CLI's configuration storage path and master its configuration format.
 
 2. **Manually create and configure the config file** at `~/.codex/config.toml`:
+
    ```toml
    [model_providers.minimax]
    name = "MiniMax Chat Completions API"
@@ -36,7 +34,8 @@ Taking MiniMax integration with Codex CLI as an example, users need to:
    model_provider = "minimax"
    ```
 
-3. **Set environment variables manually**
+3. **Carefully read the documentation to discover you need to manually set environment variables**
+
    ```bash
    export MINIMAX_API_KEY="<YOUR_API_KEY>"
    ```
@@ -47,6 +46,7 @@ Taking MiniMax integration with Codex CLI as an example, users need to:
    ```
 
 **Pain Points:**
+
 - Need to understand agent-specific configuration formats (TOML, JSON, etc.)
 - Must locate and manage configuration file paths manually
 - Repeat this process for every agent (Codex, Claude Code, etc.)
@@ -54,7 +54,7 @@ Taking MiniMax integration with Codex CLI as an example, users need to:
 
 ### With Flyfree ✨
 
-Just **2 simple commands**:
+Just **3 simple commands**:
 
 ```bash
 # 1. Install Flyfree
@@ -62,6 +62,9 @@ npm i -g @llmapis/flyfree
 
 # 2. Subscribe and auto-apply
 ff sub 'ff://minimax?key={YOUR_MINIMAX_API_KEY}' --auto
+
+# 3. Start codex
+codex
 ```
 
 **Benefits:**
