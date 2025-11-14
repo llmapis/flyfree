@@ -1,9 +1,10 @@
-import { CLAUDE_CODE } from "../../constants/agents.js";
+import { CLAUDE_CODE, CODEX } from "../../constants/agents.js";
 import type {
   BuiltinProvider,
   BuiltinProviderParams,
   BuiltinProviderResponse,
 } from "../../types/builtin.js";
+import { FFCodexEnvKey } from "../../constants/agents.js";
 import { calculateObjectHash, cleanConfigString } from "../../utils/hash.js";
 
 /**
@@ -47,7 +48,21 @@ export const miniMaxProvider: BuiltinProvider = {
 }
     `);
 
-    const claudeCodeHash = calculateObjectHash(claudeCodeSetting);
+    const codexSetting = cleanConfigString(`
+[model_providers.minimax]
+name = "MiniMax Chat Completions API"
+base_url = "https://api.minimax.io/v1"
+env_key = "${FFCodexEnvKey}"
+wire_api = "chat"
+requires_openai_auth = false
+request_max_retries = 4
+stream_max_retries = 10
+stream_idle_timeout_ms = 300000
+
+[profiles.m2]
+model = "codex-MiniMax-M2"
+model_provider = "minimax"
+      `);
 
     const response: BuiltinProviderResponse = {
       name: miniMaxProvider.name,
@@ -56,8 +71,14 @@ export const miniMaxProvider: BuiltinProvider = {
         providers: [
           {
             name: CLAUDE_CODE,
-            hash: claudeCodeHash,
+            hash: calculateObjectHash(claudeCodeSetting),
             setting: claudeCodeSetting,
+          },
+          {
+            name: CODEX,
+            hash: calculateObjectHash(claudeCodeSetting),
+            setting: codexSetting,
+            export_env: { [FFCodexEnvKey]: apiKey },
           },
         ],
         functions: [],

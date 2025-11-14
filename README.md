@@ -1,8 +1,78 @@
 # Flyfree
 
+English | [简体中文](README.zh-CN.md)
+
+📋 **[Supported Built-in Providers](#available-built-in-providers)** | 📖 [Documentation](#-documentation)
+
 > A CLI tool for managing LLM Provider configurations for AI agents like Claude Code and Codex
 
-Flyfree (自由翱翔) helps you easily manage and switch between different LLM provider configurations across multiple AI coding agents.
+Flyfree (自由飞翔) helps you easily manage and switch between different LLM provider configurations across multiple AI coding agents. It serves as a bridge between users and LLM platforms, enabling seamless configuration management and rapid platform integration.
+
+## Before and After Flyfree
+
+### Without Flyfree (Traditional Setup)
+
+Taking MiniMax integration with Codex CLI as an example, users need to:
+
+1. **Install Codex CLI**
+   ```bash
+   npm i -g @openai/codex
+   ```
+
+2. **Manually create and configure the config file** at `~/.codex/config.toml`:
+   ```toml
+   [model_providers.minimax]
+   name = "MiniMax Chat Completions API"
+   base_url = "https://api.minimax.io/v1"
+   env_key = "MINIMAX_API_KEY"
+   wire_api = "chat"
+   requires_openai_auth = false
+   request_max_retries = 4
+   stream_max_retries = 10
+   stream_idle_timeout_ms = 300000
+
+   [profiles.m2]
+   model = "codex-MiniMax-M2"
+   model_provider = "minimax"
+   ```
+
+3. **Set environment variables manually**
+   ```bash
+   export MINIMAX_API_KEY="<YOUR_API_KEY>"
+   ```
+
+4. **Start Codex with the profile**
+   ```bash
+   codex --profile m2
+   ```
+
+**Pain Points:**
+- Need to understand agent-specific configuration formats (TOML, JSON, etc.)
+- Must locate and manage configuration file paths manually
+- Repeat this process for every agent (Codex, Claude Code, etc.)
+- No centralized management for multiple providers
+
+### With Flyfree ✨
+
+Just **2 simple commands**:
+
+```bash
+# 1. Install Flyfree
+npm i -g @llmapis/flyfree
+
+# 2. Subscribe and auto-apply
+ff sub 'ff://minimax?key={YOUR_MINIMAX_API_KEY}' --auto
+```
+
+**Benefits:**
+- ✅ No need to understand agent configuration formats
+- ✅ No need to know configuration file paths
+- ✅ Automatic environment variable injection
+- ✅ Works the same way for all agents (Codex, Claude Code, etc.)
+- ✅ Centralized provider management
+- ✅ Easy switching between different providers
+
+The same simplicity applies to Claude Code and any other supported agents!
 
 ## 📖 Documentation
 
@@ -238,32 +308,14 @@ ff unsub myProvider --force
 
 Flyfree includes built-in provider support using the `ff://` protocol. These providers don't require external API endpoints - the configuration is generated internally.
 
+The purpose of built-in providers is to offer convenience for users to leverage Flyfree unilaterally in the early stages of the project. Flyfree encourages providers to implement the subscription protocol, allowing users to subscribe to agent configurations through the platform's own API.
+
 ### Available Built-in Providers
 
-#### 1. Z.AI (智谱 AI)
-
-Subscribe to ZhiPu AI's API with Claude Code support:
-
-```bash
-ff sub 'ff://z.ai?key=YOUR_API_KEY' -a zhipu --auto
-```
-
-Supported agents:
-
-- **claude-code**: Claude 3.5 Sonnet via ZhiPu's Anthropic-compatible endpoint
-- **codex**: GPT-4 via ZhiPu's OpenAI-compatible endpoint
-
-#### 2. OpenRouter
-
-Subscribe to OpenRouter's API:
-
-```bash
-ff sub 'ff://openrouter?key=YOUR_API_KEY' -a openrouter --auto
-```
-
-Supported agents:
-
-- **claude-code**: Anthropic Claude 3.5 Sonnet via OpenRouter
+| Provider | Protocol                        | Claude Code | Codex |
+| -------- | ------------------------------- | ----------- | ----- |
+| minimax  | ff://minimax?key={YOUR API KEY} | ✓           | ✓     |
+| z.ai     | ff://z.ai?key={YOUR API KEY}    | ✓           | ✗     |
 
 ### Adding Custom Built-in Providers
 
@@ -371,7 +423,6 @@ Providers should return a JSON response with the following structure:
     }
   }
 }
-
 ```
 
 See [docs/protocol.md](docs/protocol.md) for detailed protocol specification.

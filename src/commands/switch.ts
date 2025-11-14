@@ -169,7 +169,8 @@ export async function switchCommand(): Promise<void> {
         const success = await Applier.applyAgentConfig(
           selectedAgent,
           agentConfig.setting,
-          false // 需要用户确认
+          false, // 需要用户确认
+          agentConfig.export_env
         );
 
         if (success) {

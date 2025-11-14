@@ -10,6 +10,8 @@ export interface AgentConfig {
   updated_at: number;
   /** Agent 的实际配置内容（JSON 原始消息） */
   setting: unknown;
+  /** Export Env */
+  export_env?: Record<string, string>;
 }
 
 /**
@@ -30,12 +32,14 @@ export interface AgentInfo {
 export function createAgentConfig(
   name: string,
   hash: string,
-  setting: unknown
+  setting: unknown,
+  export_env?: Record<string, string>
 ): AgentConfig {
   return {
     name,
     hash,
     updated_at: Math.floor(Date.now() / 1000),
     setting,
+    export_env,
   };
 }

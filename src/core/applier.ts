@@ -6,6 +6,7 @@ const { pathExists, readJson, readFile } = fs;
 import { Storage } from './storage.js';
 import { Logger } from '../utils/logger.js';
 import { resolvePath } from '../utils/path.js';
+import { injectEnvToShell } from '../utils/env.js';
 
 /**
  * 配置应用器
@@ -17,12 +18,14 @@ export class Applier {
    * @param agentName - Agent 名称
    * @param setting - 配置内容
    * @param auto - 是否自动应用（跳过确认）
+   * @param exportEnv - 需要导出的环境变量
    * @returns 是否成功应用
    */
   static async applyAgentConfig(
     agentName: string,
     setting: unknown,
-    auto: boolean = false
+    auto: boolean = false,
+    exportEnv?: Record<string, string>
   ): Promise<boolean> {
     try {
       // 检查是否有配置路径映射
@@ -77,6 +80,12 @@ export class Applier {
       Logger.success(`Configuration applied to ${agentName}`);
       Logger.info(`Config path: ${resolvedPath}`);
 
+      // 注入环境变量（如果有）
+      if (exportEnv && Object.keys(exportEnv).length > 0) {
+        Logger.info(`Injecting environment variables for ${agentName}...`);
+        await injectEnvToShell(exportEnv);
+      }
+
       return true;
     } catch (error) {
       Logger.error(
@@ -90,16 +99,19 @@ export class Applier {
    * 批量应用多个 agent 的配置
    * @param agents - Agent 配置列表 { agentName: setting }
    * @param auto - 是否自动应用
+   * @param agentEnvs - Agent 环境变量映射 { agentName: exportEnv }
    * @returns 成功应用的 agent 列表
    */
   static async applyMultipleConfigs(
     agents: Record<string, unknown>,
-    auto: boolean = false
+    auto: boolean = false,
+    agentEnvs?: Record<string, Record<string, string>>
   ): Promise<string[]> {
     const applied: string[] = [];
 
     for (const [agentName, setting] of Object.entries(agents)) {
-      const success = await this.applyAgentConfig(agentName, setting, auto);
+      const exportEnv = agentEnvs?.[agentName];
+      const success = await this.applyAgentConfig(agentName, setting, auto, exportEnv);
       if (success) {
         applied.push(agentName);
       }

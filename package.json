@@ -1,5 +1,5 @@
 {
-  "name": "flyfree",
+  "name": "@llmapis/flyfree",
   "version": "0.1.1",
   "description": "A CLI tool for managing LLM Provider configurations for AI agents like Claude Code and Codex",
   "main": "dist/index.js",
@@ -34,6 +34,9 @@
     "dist",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.1",

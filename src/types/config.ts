@@ -1,7 +1,7 @@
 /**
  * 订阅状态
  */
-export type SubscribeStatus = 'success' | 'failed' | 'pending';
+export type SubscribeStatus = "success" | "failed" | "pending";
 
 /**
  * 单个订阅信息

@@ -13,6 +13,8 @@ export interface AgentProviderConfig {
   hash: string;
   /** Agent 的配置内容（JSON 原始消息） */
   setting: unknown;
+  /** Export Env */
+  export_env?: Record<string, string>;
 }
 
 /**

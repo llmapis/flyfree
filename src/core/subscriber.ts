@@ -2,6 +2,9 @@ import axios from "axios";
 import ora from "ora";
 import { checkbox } from "@inquirer/prompts";
 import chalk from "chalk";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import type { SubscribeResponse, ProviderConfig } from "../types/provider.js";
 import type { SubscribeInfo } from "../types/config.js";
 import { createAgentConfig } from "../types/agent.js";
@@ -15,6 +18,13 @@ import { Applier } from "./applier.js";
 import { Logger } from "../utils/logger.js";
 import { HTTP_TIMEOUT } from "../constants/index.js";
 import { handleBuiltinProvider } from "./builtin-providers.js";
+
+// 获取 package.json 的版本号
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJsonPath = join(__dirname, "../../package.json");
+const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+const VERSION = packageJson.version;
 
 /**
  * 订阅管理器
@@ -30,7 +40,7 @@ export class Subscriber {
       const response = await axios.get(url, {
         timeout: HTTP_TIMEOUT,
         headers: {
-          "User-Agent": "Flyfree/0.1.0",
+          "User-Agent": `Flyfree/${VERSION}`,
         },
       });
 
@@ -118,14 +128,15 @@ export class Subscriber {
       };
 
       await Storage.writeProviderConfig(providerName, providerConfig);
-      Logger.success(`Provider configuration saved: ${providerName}`);
+      console.log(chalk.green('✔'), chalk.magenta(`Provider configuration saved: ${chalk.bold(providerName)}`));
 
       // 5. 保存各个 agent 的配置
       for (const agentConfig of data.data.payload.providers) {
         const agentConfigData = createAgentConfig(
           agentConfig.name,
           agentConfig.hash,
-          agentConfig.setting
+          agentConfig.setting,
+          agentConfig.export_env
         );
 
         await Storage.writeAgentConfig(
@@ -133,7 +144,7 @@ export class Subscriber {
           agentConfig.name,
           agentConfigData
         );
-        Logger.success(`Agent configuration saved: ${agentConfig.name}`);
+        console.log(chalk.green('✔'), chalk.cyan(`Agent configuration saved: ${chalk.bold(agentConfig.name)}`));
       }
 
       // 6. 更新 sub.json
@@ -202,6 +213,7 @@ export class Subscriber {
         // 应用选中的 agents
         Logger.info("");
         const agentsToApply: Record<string, unknown> = {};
+        const agentEnvs: Record<string, Record<string, string>> = {};
         const skippedAgents: string[] = [];
 
         for (const agentName of selectedAgents) {
@@ -211,6 +223,9 @@ export class Subscriber {
             );
             if (agentConfig) {
               agentsToApply[agentName] = agentConfig.setting;
+              if (agentConfig.export_env) {
+                agentEnvs[agentName] = agentConfig.export_env;
+              }
             }
           } else {
             skippedAgents.push(agentName);
@@ -226,7 +241,8 @@ export class Subscriber {
         if (Object.keys(agentsToApply).length > 0) {
           const applied = await Applier.applyMultipleConfigs(
             agentsToApply,
-            true
+            true,
+            agentEnvs
           );
 
           // 更新 setting 字段
@@ -252,16 +268,21 @@ export class Subscriber {
         Logger.info("Auto-applying configurations...");
 
         const agentsToApply: Record<string, unknown> = {};
+        const agentEnvs: Record<string, Record<string, string>> = {};
         for (const agentConfig of data.data.payload.providers) {
           if (Applier.hasConfigPath(agentConfig.name)) {
             agentsToApply[agentConfig.name] = agentConfig.setting;
+            if (agentConfig.export_env) {
+              agentEnvs[agentConfig.name] = agentConfig.export_env;
+            }
           }
         }
 
         if (Object.keys(agentsToApply).length > 0) {
           const applied = await Applier.applyMultipleConfigs(
             agentsToApply,
-            true
+            true,
+            agentEnvs
           );
 
           // 更新 setting 字段

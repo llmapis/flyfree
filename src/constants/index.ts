@@ -1,5 +1,6 @@
 import { homedir } from "os";
 import { join } from "path";
+import { CLAUDE_CODE, CODEX } from "./agents.js";
 
 /**
  * Flyfree 配置目录路径
@@ -36,8 +37,8 @@ export const MAX_BACKUPS = 10;
  * 采用可扩展的设计，未知的 agent 路径可后续添加
  */
 export const AGENT_CONFIG_PATHS: Record<string, string> = {
-  "claude-code": join(homedir(), ".claude", "settings.json"),
+  [CLAUDE_CODE]: join(homedir(), ".claude", "settings.json"),
   // 其他 agent 路径可后续添加
-  // 'codex': join(homedir(), '.codex', 'config.json'),
+  [CODEX]: join(homedir(), ".codex", "config.toml"),
   // 'qwen-cli': join(homedir(), '.qwen', 'config.json'),
 };
