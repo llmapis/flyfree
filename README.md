@@ -7,6 +7,7 @@ English | [简体中文](README.zh-CN.md)
 > A CLI tool for managing LLM Provider configurations for AI agents like Claude Code and Codex
 
 Flyfree (自由飞翔) helps you easily manage and switch between different LLM provider configurations across multiple AI coding agents. It serves as a bridge between users and LLM platforms, enabling seamless configuration management and rapid platform integration.
+Flyfree not only simplifies the steps for users to connect with LLM API providers, but also simplifies the process for LLM providers to describe integration to users (ordinary users may not need to understand the configuration structure of each Agent).
 
 ## Before and After Flyfree
 
@@ -68,6 +69,7 @@ codex
 ```
 
 **Benefits:**
+
 - ✅ No need to understand agent configuration formats
 - ✅ No need to know configuration file paths
 - ✅ Automatic environment variable injection
@@ -97,6 +99,18 @@ The same simplicity applies to Claude Code and any other supported agents!
 - 🔌 Built-in provider support with `ff://` protocol
 - 📋 Agent selection with `--select` option
 - 🔢 Automatic backup management (max 10 backups per agent)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+Thanks:
+
+<a href="https://github.com/llmapis/flyfree/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=llmapis/flyfree" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## Installation
 
@@ -523,10 +537,6 @@ Enable debug mode to see detailed error information:
 ```bash
 DEBUG=1 ff sub https://example.com/config
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

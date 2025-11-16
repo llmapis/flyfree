@@ -7,7 +7,7 @@
 > 用于管理 AI 代理（如 Claude Code 和 Codex）LLM 提供商配置的 CLI 工具
 
 Flyfree（自由飞翔）帮助您轻松管理和切换多个 AI Agent 的不同 LLM 提供商配置。它充当用户与 LLM 平台之间的桥梁，实现无缝配置管理和快速平台集成。
-Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化了 LLM 供应商描向用户描述的接入文档。
+Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化了 LLM 供应商描向用户描述接入的过程(普通用户或许没必要了解每个 Agent 的配置构成)。
 
 ## 使用 Flyfree 前后对比
 
@@ -99,6 +99,18 @@ codex
 - 🔌 使用 `ff://` 协议支持内置提供商
 - 📋 使用 `--select` 选项选择代理
 - 🔢 自动备份管理（每个代理最多 10 个备份）
+
+## 贡献
+
+欢迎贡献！请随时提交 Pull Request。
+
+感谢：
+
+<a href="https://github.com/llmapis/flyfree/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=llmapis/flyfree" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## 安装
 
@@ -525,10 +537,6 @@ Flyfree 在修改任何代理配置之前会自动创建备份：
 ```bash
 DEBUG=1 ff sub https://example.com/config
 ```
-
-## 贡献
-
-欢迎贡献！请随时提交 Pull Request。
 
 ## 许可证
 
