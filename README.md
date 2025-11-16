@@ -115,13 +115,13 @@ Made with [contrib.rocks](https://contrib.rocks).
 ## Installation
 
 ```bash
-npm install -g flyfree
+npm i -g @llmapis/flyfree
 ```
 
 Or use directly with npx:
 
 ```bash
-npx flyfree <command>
+npx @llmapis/flyfree <command>
 ```
 
 ## Quick Start

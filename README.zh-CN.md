@@ -115,13 +115,13 @@ Made with [contrib.rocks](https://contrib.rocks).
 ## 安装
 
 ```bash
-npm install -g @llmapis/flyfree
+npm i -g @llmapis/flyfree
 ```
 
 或直接使用 npx：
 
 ```bash
-npx flyfree <command>
+npx @llmapis/flyfree <command>
 ```
 
 ## 快速开始
