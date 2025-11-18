@@ -42,3 +42,38 @@ export const AGENT_CONFIG_PATHS: Record<string, string> = {
   [CODEX]: join(homedir(), ".codex", "config.toml"),
   // 'qwen-cli': join(homedir(), '.qwen', 'config.json'),
 };
+
+/**
+ * Skill 配置文件路径
+ */
+export const SKILL_CONFIG_FILE = join(FF_HOME, "skill.json");
+
+/**
+ * Claude 全局 Skills 目录路径
+ */
+export const CLAUDE_GLOBAL_SKILLS_DIR = join(homedir(), ".claude", "skills");
+
+/**
+ * 支持的 agent 列表（Skill 功能支持的 agent）
+ */
+export const SUPPORTED_AGENTS_FOR_SKILL = ["claude"] as const;
+
+/**
+ * Skill 目录名称
+ */
+export const SKILL_DIR_NAME = ".claude";
+
+/**
+ * Skill 文件名
+ */
+export const SKILL_FILENAME = "SKILL.md";
+
+/**
+ * Skill 搜索的最大深度（递归搜索层级限制）
+ */
+export const MAX_SKILL_SEARCH_DEPTH = 5;
+
+/**
+ * Skill 下载并发数限制
+ */
+export const MAX_CONCURRENT_DOWNLOADS = 5;

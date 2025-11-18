@@ -8,6 +8,7 @@ import { unsubscribeCommand } from './commands/unsubscribe.js';
 import { resetCommand } from './commands/reset.js';
 import { setCommand } from './commands/set.js';
 import { restoreCommand } from './commands/restore.js';
+import { registerSkillCommand } from './commands/skill/index.js';
 import { Logger } from './utils/logger.js';
 
 // 全局错误处理
@@ -84,6 +85,9 @@ program
   .description('Restore agent configurations from backups')
   .option('-l, --list', 'List all available backups')
   .action(restoreCommand);
+
+// Skill 命令
+registerSkillCommand(program);
 
 // 解析命令行参数
 program.parse(process.argv);

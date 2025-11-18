@@ -3,11 +3,13 @@ import fs from 'fs-extra';
 
 const { ensureDir, readJSON, writeJSON, pathExists, copy, remove } = fs;
 import { join, dirname } from 'path';
+import path from 'path';
 import type { SubConfig } from '../types/config.js';
 import type { ProviderConfig } from '../types/provider.js';
 import type { AgentConfig } from '../types/agent.js';
+import type { SkillConfig } from '../types/skill.js';
 import { createDefaultSubConfig } from '../types/config.js';
-import { FF_HOME, SUB_CONFIG_FILE, BACKUPS_DIR, MAX_BACKUPS } from '../constants/index.js';
+import { FF_HOME, SUB_CONFIG_FILE, BACKUPS_DIR, MAX_BACKUPS, SKILL_CONFIG_FILE } from '../constants/index.js';
 import { Logger } from '../utils/logger.js';
 
 /**
@@ -317,5 +319,102 @@ export class Storage {
     } catch (error) {
       Logger.warn(`Failed to cleanup old backups for ${agentName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  /**
+   * 读取 skill.json
+   */
+  static async readSkillConfig(): Promise<SkillConfig> {
+    try {
+      await this.initialize();
+      if (!(await pathExists(SKILL_CONFIG_FILE))) {
+        // 如果文件不存在，返回默认配置
+        return this.createDefaultSkillConfig();
+      }
+      return await readJSON(SKILL_CONFIG_FILE);
+    } catch (error) {
+      throw new Error(
+        `Failed to read skill.json: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * 写入 skill.json
+   */
+  static async writeSkillConfig(config: SkillConfig): Promise<void> {
+    try {
+      await this.initialize();
+      await writeJSON(SKILL_CONFIG_FILE, config, { spaces: 2 });
+      Logger.debug('Updated skill.json');
+    } catch (error) {
+      throw new Error(
+        `Failed to write skill.json: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * 创建默认的 Skill 配置
+   */
+  static createDefaultSkillConfig(): SkillConfig {
+    return {
+      skills: {},
+    };
+  }
+
+  /**
+   * 获取 Skill 目录路径
+   * @param skillName - Skill 名称
+   * @param targetAgent - 目标 agent
+   * @param isGlobal - 是否全局安装
+   * @returns Skill 目录的完整路径
+   */
+  static getSkillPath(skillName: string, targetAgent: string, isGlobal: boolean): string {
+    if (isGlobal) {
+      // 全局安装到 ~/.claude/skills/
+      return join(FF_HOME, '..', '.claude', 'skills', skillName);
+    } else {
+      // 本地安装到项目根目录的 .claude/skills/
+      // 查找项目根目录（包含 package.json 或 .git 或 .ff 的目录）
+      const projectRoot = this.findProjectRoot(process.cwd());
+      return join(projectRoot, '.claude', 'skills', skillName);
+    }
+  }
+
+  /**
+   * 查找项目根目录
+   * 向上遍历目录树，查找包含特定标识文件的目录
+   * @param startPath - 开始查找的路径
+   * @returns 项目根目录路径
+   */
+  static findProjectRoot(startPath: string): string {
+    let currentPath = startPath;
+
+    while (currentPath !== path.dirname(currentPath)) {
+      // 检查是否包含项目标识文件
+      const hasPackageJson = fs.existsSync(path.join(currentPath, 'package.json'));
+      const hasGitDir = fs.existsSync(path.join(currentPath, '.git'));
+      const hasFfConfig = fs.existsSync(path.join(currentPath, '.ff'));
+      const hasSrcDir = fs.existsSync(path.join(currentPath, 'src'));
+
+      if (hasPackageJson || hasGitDir || hasFfConfig || hasSrcDir) {
+        return currentPath;
+      }
+
+      currentPath = path.dirname(currentPath);
+    }
+
+    // 如果没找到，返回起始路径
+    return startPath;
+  }
+
+  /**
+   * 清理旧的 Skill 备份
+   * Skill 功能暂时不需要备份机制，预留接口
+   */
+  static async cleanupOldSkillBackups(): Promise<void> {
+    // Skill 功能暂不需要备份清理，预留接口
+    Logger.debug('Skill backup cleanup skipped - not implemented yet');
   }
 }
