@@ -9,7 +9,7 @@
 | `ff sub <url>` | - | 订阅 Provider | `ff sub 'ff://z.ai?key=KEY' -a zhipu` |
 | `ff list` | `ff ls` | 查看订阅 | `ff list` |
 | `ff switch` | `ff s` | 交互式切换 | `ff switch` |
-| `ff set <agent> <provider>` | - | 快速切换 | `ff set claude-code zhipu` |
+| `ff set <endpoint> <key> <model>` | - | 自定义配置 | `ff set https://api.com/v1 sk-xxx model -a name` |
 | `ff reset [agent]` | - | 重置配置 | `ff reset claude-code` |
 | `ff restore [agent]` | - | 恢复配置 | `ff restore --list` |
 | `ff unsub <provider>` | - | 取消订阅 | `ff unsub zhipu` |
@@ -29,6 +29,14 @@ ff sub 'ff://openrouter?key=YOUR_API_KEY' -a openrouter --auto
 ```
 - **获取 Key**: [openrouter.ai](https://openrouter.ai/)
 - **支持**: claude-code
+
+### 自定义 Provider
+```bash
+ff set <endpoint> <api-key> <model> -a <name>
+```
+- **示例**: `ff set https://api.example.com/v1 sk-xxx claude-3-5-sonnet -a custom`
+- **支持**: claude-code, codex（交互式选择）
+- **适用**: 任意兼容 Anthropic/OpenAI API 的服务
 
 ## 📁 配置文件路径
 

@@ -6,6 +6,10 @@ import type {
 } from "../../types/builtin.js";
 import { FFCodexEnvKey } from "../../constants/agents.js";
 import { calculateObjectHash, cleanConfigString } from "../../utils/hash.js";
+import { generateClaudeCodeConfig, generateCodexConfig } from "./tpl.js";
+
+export const MINIMAX_DEFAULT_CLAUDE_ENDPOINT =
+  "https://api.minimaxi.com/anthropic";
 
 /**
  * Z.AI (智谱AI) Provider
@@ -31,37 +35,17 @@ export const miniMaxProvider: BuiltinProvider = {
       );
     }
 
-    // Claude Code 配置
-    const claudeCodeSetting = cleanConfigString(`
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://api.minimaxi.com/anthropic",
-    "ANTHROPIC_AUTH_TOKEN": "${apiKey}",
-    "API_TIMEOUT_MS": "3000000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
-    "ANTHROPIC_MODEL": "MiniMax-M2",
-    "ANTHROPIC_SMALL_FAST_MODEL": "MiniMax-M2",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "MiniMax-M2",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "MiniMax-M2",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M2"
-  }
-}
-    `);
+    const claudeCodeSetting = generateClaudeCodeConfig(
+      MINIMAX_DEFAULT_CLAUDE_ENDPOINT,
+      apiKey,
+      "MiniMax-M2"
+    );
 
-    const codexSetting = cleanConfigString(`
-model_provider = "minimax"
-model = "codex-MiniMax-M2"
-
-[model_providers.minimax]
-name = "MiniMax Chat Completions API"
-base_url = "https://api.minimax.io/v1"
-env_key = "${FFCodexEnvKey}"
-wire_api = "chat"
-requires_openai_auth = false
-request_max_retries = 4
-stream_max_retries = 10
-stream_idle_timeout_ms = 300000
-      `);
+    const codexSetting = generateCodexConfig(
+      MINIMAX_DEFAULT_CLAUDE_ENDPOINT,
+      apiKey,
+      "MiniMax-M2"
+    );
 
     const response: BuiltinProviderResponse = {
       name: miniMaxProvider.name,

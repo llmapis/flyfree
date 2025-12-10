@@ -1,9 +1,9 @@
-import type { BuiltinProvider, BuiltinProviderResponse } from "../types/builtin.js";
+import type { BuiltinProvider } from "../types/builtin.js";
 import type { SubscribeResponse } from "../types/provider.js";
 import {
   zaiProvider,
-  openrouterProvider,
   miniMaxProvider,
+  customProvider,
 } from "./providers/index.js";
 
 /**
@@ -59,7 +59,7 @@ export const builtinProviders = new BuiltinProviderRegistry();
 
 builtinProviders.register(zaiProvider);
 builtinProviders.register(miniMaxProvider);
-builtinProviders.register(openrouterProvider);
+builtinProviders.register(customProvider);
 
 /**
  * 解析 ff:// 协议 URL

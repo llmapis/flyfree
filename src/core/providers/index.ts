@@ -6,4 +6,4 @@
 
 export { zaiProvider } from "./z.ai.js";
 export { miniMaxProvider } from "./minimax.js";
-export { openrouterProvider } from "./openrouter.js";
+export { customProvider } from "./custom.js";

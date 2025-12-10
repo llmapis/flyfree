@@ -54,6 +54,103 @@ export class SkillManager {
   }
 
   /**
+   * 解析 GitHub URL 信息
+   */
+  static parseGitHubUrl(url: string): { owner: string; repo: string; branch: string; path: string } | null {
+    const githubRegex = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)$/;
+    const match = url.match(githubRegex);
+
+    if (match) {
+      const [, owner, repo, branch, path] = match;
+      return { owner, repo, branch, path };
+    }
+
+    return null;
+  }
+
+  /**
+   * 获取 GitHub 目录内容
+   */
+  static async getGitHubDirectoryContents(url: string): Promise<Array<{ name: string; type: 'file' | 'dir'; downloadUrl?: string }>> {
+    const githubInfo = this.parseGitHubUrl(url);
+
+    if (!githubInfo) {
+      throw new Error('Not a valid GitHub directory URL');
+    }
+
+    const { owner, repo, branch, path } = githubInfo;
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+
+    try {
+      Logger.debug(`Fetching directory contents from GitHub API: ${apiUrl}`);
+      const response = await axios.get(apiUrl, {
+        timeout: 30000,
+        headers: {
+          'User-Agent': 'flyfree-skill-manager',
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (!Array.isArray(response.data)) {
+        throw new Error('URL does not point to a directory');
+      }
+
+      return response.data.map((item: any) => ({
+        name: item.name,
+        type: item.type === 'file' ? 'file' : 'dir',
+        downloadUrl: item.download_url,
+      }));
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch GitHub directory contents: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * 递归下载目录内容
+   */
+  static async downloadDirectory(url: string, targetPath: string): Promise<void> {
+    const githubInfo = this.parseGitHubUrl(url);
+
+    if (!githubInfo) {
+      // 非 GitHub URL，只下载 SKILL.md
+      const rawUrl = await this.convertToRawUrl(url);
+      const skillMdContent = await this.downloadFromUrl(`${rawUrl.replace(/\/$/, '')}/${SKILL_FILENAME}`);
+      await fs.writeFile(path.join(targetPath, SKILL_FILENAME), skillMdContent, 'utf-8');
+      return;
+    }
+
+    // GitHub URL，下载整个目录
+    const contents = await this.getGitHubDirectoryContents(url);
+
+    for (const item of contents) {
+      const itemPath = path.join(targetPath, item.name);
+
+      if (item.type === 'file') {
+        if (item.downloadUrl) {
+          Logger.debug(`Downloading file: ${item.name}`);
+          const content = await this.downloadFromUrl(item.downloadUrl);
+
+          // 判断是否为二进制文件
+          if (typeof content === 'string') {
+            await fs.writeFile(itemPath, content, 'utf-8');
+          } else {
+            await fs.writeFile(itemPath, content);
+          }
+        }
+      } else if (item.type === 'dir') {
+        // 递归下载子目录
+        const { owner, repo, branch, path: basePath } = githubInfo;
+        const subDirUrl = `https://github.com/${owner}/${repo}/tree/${branch}/${basePath}/${item.name}`;
+
+        await fs.ensureDir(itemPath);
+        await this.downloadDirectory(subDirUrl, itemPath);
+      }
+    }
+  }
+
+  /**
    * 从 URL 下载内容
    */
   static async downloadFromUrl(url: string): Promise<string> {
@@ -339,11 +436,12 @@ export class SkillManager {
       // 下载并复制 Skill 文件
       Logger.info(`Installing skill: ${skill.name}`);
       try {
-        const rawUrl = await this.convertToRawUrl(skill.path);
-        const skillMdContent = await this.downloadFromUrl(`${rawUrl.replace(/\/$/, '')}/${SKILL_FILENAME}`);
+        // 下载整个目录（包括 SKILL.md 和其他文件）
+        await this.downloadDirectory(skill.path, skillPath);
 
-        // 写入 SKILL.md
-        await fs.writeFile(path.join(skillPath, SKILL_FILENAME), skillMdContent, 'utf-8');
+        // 读取 SKILL.md 内容以验证
+        const skillMdPath = path.join(skillPath, SKILL_FILENAME);
+        const skillMdContent = await fs.readFile(skillMdPath, 'utf-8');
 
         // 计算 hash
         const hash = await this.calculateDirectoryHash(skillPath);
@@ -454,11 +552,6 @@ export class SkillManager {
     Logger.info(`Checking for updates: ${skillName}`);
 
     try {
-      // 检查远程更新
-      const rawUrl = await this.convertToRawUrl(skillInfo.url);
-      const remoteSkillMdUrl = `${rawUrl.replace(/\/$/, '')}/${SKILL_FILENAME}`;
-      const remoteContent = await this.downloadFromUrl(remoteSkillMdUrl);
-
       // 重新计算本地 hash
       const localHash = await this.calculateDirectoryHash(skillInfo.localPath);
 
@@ -476,8 +569,15 @@ export class SkillManager {
       await fs.copy(skillInfo.localPath, backupPath);
 
       try {
-        // 写入新版本
-        await fs.writeFile(path.join(skillInfo.localPath, SKILL_FILENAME), remoteContent, 'utf-8');
+        // 清空目标目录
+        await fs.emptyDir(skillInfo.localPath);
+
+        // 重新下载整个目录（包括所有文件）
+        await this.downloadDirectory(skillInfo.url, skillInfo.localPath);
+
+        // 读取 SKILL.md 内容以验证
+        const skillMdPath = path.join(skillInfo.localPath, SKILL_FILENAME);
+        const remoteContent = await fs.readFile(skillMdPath, 'utf-8');
 
         // 更新配置
         const newHash = await this.calculateDirectoryHash(skillInfo.localPath);

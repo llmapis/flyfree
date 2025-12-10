@@ -1,5 +1,5 @@
-import { Subscriber } from '../core/subscriber.js';
-import { Logger } from '../utils/logger.js';
+import { Subscriber } from "../core/subscriber.js";
+import { Logger } from "../utils/logger.js";
 
 /**
  * Subscribe 命令选项
@@ -30,36 +30,43 @@ export async function subscribeCommand(
     }
 
     if (options.auto) {
-      Logger.info('Auto-apply mode enabled');
+      Logger.info("Auto-apply mode enabled");
     }
 
     if (options.select) {
-      if (typeof options.select === 'string') {
+      if (typeof options.select === "string") {
         Logger.info(`Selecting agents: ${options.select}`);
       } else {
-        Logger.info('Interactive agent selection enabled');
+        Logger.info("Interactive agent selection enabled");
       }
     }
 
     // 执行订阅
-    await Subscriber.subscribe(url, options.alias, options.auto, options.select);
+    await Subscriber.subscribe(
+      url,
+      options.alias,
+      options.auto,
+      options.select
+    );
 
-    Logger.info('');
-    Logger.success('Subscription completed successfully!');
+    Logger.info("");
+    Logger.success("Subscription completed successfully!");
 
     if (!options.auto && !options.select) {
-      Logger.info('');
-      Logger.info('To apply configurations, use:');
-      Logger.info('  ff switch (or ff s)');
+      Logger.info("");
+      Logger.info("To apply configurations, use:");
+      Logger.info("  ff switch (or ff s)");
     }
 
     // 命令结束，添加空行
-    Logger.info('');
+    Logger.info("");
   } catch (error) {
     Logger.error(
-      `Subscription failed: ${error instanceof Error ? error.message : String(error)}`
+      `Subscription failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`
     );
-    Logger.info('');
+    Logger.info("");
     process.exit(1);
   }
 }

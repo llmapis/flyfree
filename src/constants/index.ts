@@ -33,6 +33,16 @@ export const MAX_RETRIES = 3;
 export const MAX_BACKUPS = 10;
 
 /**
+ * 支持的 Agent 类型
+ */
+export const AGENT_TYPES = {
+  CLAUDE_CODE,
+  CODEX,
+} as const;
+
+export type AgentType = (typeof AGENT_TYPES)[keyof typeof AGENT_TYPES];
+
+/**
  * Agent 配置文件路径映射
  * 采用可扩展的设计，未知的 agent 路径可后续添加
  */
@@ -40,6 +50,13 @@ export const AGENT_CONFIG_PATHS: Record<string, string> = {
   [CLAUDE_CODE]: join(homedir(), ".claude", "settings.json"),
   // 其他 agent 路径可后续添加
   [CODEX]: join(homedir(), ".codex", "config.toml"),
+  // 'qwen-cli': join(homedir(), '.qwen', 'config.json'),
+};
+
+export const AGENT_START_COMMAND: Record<string, string> = {
+  [CLAUDE_CODE]: "claude",
+  // 其他 agent 路径可后续添加
+  [CODEX]: "codex",
   // 'qwen-cli': join(homedir(), '.qwen', 'config.json'),
 };
 

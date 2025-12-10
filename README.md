@@ -90,7 +90,7 @@ The same simplicity applies to Claude Code and any other supported agents!
 
 - 🔄 Subscribe to provider configurations via URL or built-in providers
 - 🎯 Interactive configuration switching
-- ⚡ Quick provider switching with `set` command
+- ⚡ Custom provider configuration with `set` command
 - 🔄 Configuration backup and restore functionality
 - 🧹 Safe configuration reset with backup protection
 - 📦 Support for multiple agents (Claude Code, Codex, etc.)
@@ -99,6 +99,7 @@ The same simplicity applies to Claude Code and any other supported agents!
 - 🔌 Built-in provider support with `ff://` protocol
 - 📋 Agent selection with `--select` option
 - 🔢 Automatic backup management (max 10 backups per agent)
+- 🛠️ Support for any Anthropic/OpenAI compatible API endpoints
 
 ## Contributing
 
@@ -223,24 +224,34 @@ This command will:
 3. Show available agents for that provider
 4. Apply the selected agent configuration (with confirmation)
 
-### `ff set <agent> <provider>`
+### `ff set <endpoint> <api-key> <model> -a <name>`
 
-Quickly switch agent provider configuration.
+Configure custom LLM provider with any Anthropic/OpenAI compatible API.
 
 **Arguments:**
 
-- `agent` - The agent name to switch
-- `provider` - The target provider name
+- `endpoint` - API endpoint URL
+- `api-key` - API key for authentication
+- `model` - Model name to use
+
+**Options:**
+
+- `-a, --alias <name>` - Provider alias name (required)
 
 **Example:**
 
 ```bash
-# Switch claude-code to use ZhiPu provider
-ff set claude-code ZhiPu
+# Configure custom provider
+ff set https://api.example.com/v1 sk-xxx claude-3-opus-20240229 -a my-custom
 
-# Switch claude-code to use OpenRouter provider
-ff set claude-code OpenRouter
+# Configure proxy service
+ff set https://api.proxy.com/v1 sk-xxx claude-3-5-sonnet-20241022 -a proxy
+
+# Configure local service
+ff set http://localhost:8000/v1 local-key gpt-4 -a local
 ```
+
+After configuration, you'll be prompted to select which agent (Claude Code or Codex) to configure interactively.
 
 ### `ff reset [agent] [options]`
 

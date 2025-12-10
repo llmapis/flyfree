@@ -164,27 +164,36 @@ ff s  # 简写
 2. 选择 Agent
 3. 确认应用配置
 
-### set - 快速切换
+### set - 自定义 Provider 配置
 
-直接指定 Agent 和 Provider 进行快速切换。
+配置自定义 LLM Provider，支持任意兼容 Anthropic/OpenAI API 的服务。
 
 ```bash
-ff set <agent> <provider>
+ff set <endpoint> <api-key> <model> -a <name>
 ```
 
 **参数**:
-- `<agent>`: Agent 名称（如 `claude-code`）
-- `<provider>`: Provider 名称（如 `zhipu`）
+- `<endpoint>`: API 端点 URL
+- `<api-key>`: API 密钥
+- `<model>`: 模型名称
+- `-a, --alias <name>`: Provider 别名（必填）
 
 #### 示例
 
 ```bash
-# 将 claude-code 切换到智谱AI
-ff set claude-code zhipu
+# 配置自定义 Provider
+ff set https://api.example.com/v1 sk-xxx claude-3-opus-20240229 -a my-custom
 
-# 将 codex 切换到 OpenRouter
-ff set codex openrouter
+# 配置国内中转服务
+ff set https://api.myproxy.com/v1 sk-xxx claude-3-5-sonnet-20241022 -a proxy
+
+# 配置自建服务
+ff set http://localhost:8000/v1 local-key gpt-4 -a local
 ```
+
+命令执行后会交互式询问你要配置哪个 Agent（Claude Code 或 Codex），然后自动订阅并应用配置。
+
+配置完成后，可以使用 `ff switch` 命令在不同 Provider 之间切换。
 
 ### reset - 重置配置
 

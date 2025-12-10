@@ -58,7 +58,9 @@ export class Subscriber {
       // 检查响应中的错误信息
       if (responseData.meta.code && responseData.meta.code !== 200) {
         const errorMsg = responseData.meta.message || "Unknown error";
-        throw new Error(`Provider error (${responseData.meta.code}): ${errorMsg}`);
+        throw new Error(
+          `Provider error (${responseData.meta.code}): ${errorMsg}`
+        );
       }
 
       return responseData;
@@ -95,7 +97,7 @@ export class Subscriber {
     alias?: string,
     auto: boolean = false,
     select?: boolean | string
-  ): Promise<void> {
+  ): Promise<string[]> {
     try {
       // 1. 获取订阅配置
       let data: SubscribeResponse;
@@ -128,7 +130,12 @@ export class Subscriber {
       };
 
       await Storage.writeProviderConfig(providerName, providerConfig);
-      console.log(chalk.green('✔'), chalk.magenta(`Provider configuration saved: ${chalk.bold(providerName)}`));
+      console.log(
+        chalk.green("✔"),
+        chalk.magenta(
+          `Provider configuration saved: ${chalk.bold(providerName)}`
+        )
+      );
 
       // 5. 保存各个 agent 的配置
       for (const agentConfig of data.data.payload.providers) {
@@ -144,7 +151,12 @@ export class Subscriber {
           agentConfig.name,
           agentConfigData
         );
-        console.log(chalk.green('✔'), chalk.cyan(`Agent configuration saved: ${chalk.bold(agentConfig.name)}`));
+        console.log(
+          chalk.green("✔"),
+          chalk.cyan(
+            `Agent configuration saved: ${chalk.bold(agentConfig.name)}`
+          )
+        );
       }
 
       // 6. 更新 sub.json
@@ -206,7 +218,7 @@ export class Subscriber {
 
           if (selectedAgents.length === 0) {
             Logger.warn("No agents selected");
-            return;
+            return [];
           }
         }
 
@@ -260,7 +272,7 @@ export class Subscriber {
           Logger.warn("No agents with configured paths to apply");
         }
 
-        return;
+        return selectedAgents;
       }
 
       // 8. 如果开启 auto，自动应用配置
@@ -296,6 +308,7 @@ export class Subscriber {
               applied.length
             } agent(s): ${applied.join(", ")}`
           );
+          return applied;
         } else {
           Logger.warn("No agents with configured paths found");
         }
@@ -318,6 +331,7 @@ export class Subscriber {
 
       throw error;
     }
+    return [];
   }
 
   /**

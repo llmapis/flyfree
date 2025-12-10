@@ -1,6 +1,6 @@
 {
   "name": "@llmapis/flyfree",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A CLI tool for managing LLM Provider configurations for AI agents like Claude Code and Codex",
   "main": "dist/index.js",
   "bin": {
@@ -25,7 +25,7 @@
     "configuration",
     "management"
   ],
-  "author": "wangboyan",
+  "author": "boyce/w",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

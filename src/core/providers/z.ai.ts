@@ -5,6 +5,10 @@ import type {
   BuiltinProviderResponse,
 } from "../../types/builtin.js";
 import { calculateObjectHash, cleanConfigString } from "../../utils/hash.js";
+import { generateClaudeCodeConfig } from "./tpl.js";
+
+export const ZAI_DEFAULT_CLAUDE_ENDPOINT =
+  "https://open.bigmodel.cn/api/anthropic";
 
 /**
  * Z.AI (智谱AI) Provider
@@ -30,16 +34,11 @@ export const zaiProvider: BuiltinProvider = {
     }
 
     // Claude Code 配置
-    const claudeCodeSetting = cleanConfigString(`
-{
-    "env": {
-        "ANTHROPIC_AUTH_TOKEN": "${apiKey}",
-        "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
-        "API_TIMEOUT_MS": "3000000",
-        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1
-    }
-}
-    `);
+    const claudeCodeSetting = generateClaudeCodeConfig(
+      ZAI_DEFAULT_CLAUDE_ENDPOINT,
+      apiKey,
+      "GLM-4.6"
+    );
 
     const claudeCodeHash = calculateObjectHash(claudeCodeSetting);
 
