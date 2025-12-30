@@ -197,17 +197,18 @@ export class Subscriber {
           }
         } else {
           // 交互式选择
-          const choices = data.data.payload.providers.map((p) => {
+          const choices: Array<{ name: string; value: string; checked: boolean }> = [];
+          data.data.payload.providers.forEach((p, k, a) => {
             const hasPath = Applier.hasConfigPath(p.name);
             let name = p.name;
             if (!hasPath) {
-              name += chalk.yellow(" (no path)");
+              return;
             }
-            return {
+            choices.push({
               name,
               value: p.name,
-              checked: hasPath,
-            };
+              checked: false,
+            });
           });
 
           selectedAgents = await checkbox({

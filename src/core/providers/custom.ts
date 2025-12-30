@@ -1,4 +1,4 @@
-import { CLAUDE_CODE, CODEX } from "../../constants/agents.js";
+import { CLAUDE_CODE, CODEX, FFCodexEnvKey } from "../../constants/agents.js";
 import type {
   BuiltinProvider,
   BuiltinProviderParams,
@@ -77,6 +77,7 @@ export const customProvider: BuiltinProvider = {
       name: CODEX,
       hash: codexHash,
       setting: codexSetting,
+      export_env: { [FFCodexEnvKey]: apiKey },
     });
 
     const response: BuiltinProviderResponse = {

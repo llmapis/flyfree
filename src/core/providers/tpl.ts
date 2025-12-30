@@ -26,10 +26,11 @@ const CLAUDE_CODE_TPL = `
 `;
 
 const CODEX_TPL = `
-model_provider = "custom"
+[profiles.flyfree]
+model_provider = "flyfree"
 model = "\${model}"
 
-[model_providers.custom]
+[model_providers.flyfree]
 name = "Custom Provider"
 base_url = "\${endpoint}"
 env_key = "${FFCodexEnvKey}"

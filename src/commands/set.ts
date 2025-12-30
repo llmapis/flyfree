@@ -84,7 +84,9 @@ export async function setCommand(
     Logger.info("");
     Logger.info("You can now use:");
     subscribedAgents.forEach((v) => {
-      Logger.info(`  ${AGENT_START_COMMAND[v]}        # To start vibe coding`);
+      Logger.info(
+        `  ff ${AGENT_START_COMMAND[v]}        # To start vibe coding`
+      );
     });
 
     Logger.info(

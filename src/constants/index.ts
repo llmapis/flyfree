@@ -54,9 +54,9 @@ export const AGENT_CONFIG_PATHS: Record<string, string> = {
 };
 
 export const AGENT_START_COMMAND: Record<string, string> = {
-  [CLAUDE_CODE]: "claude",
+  claude: "claude",
   // 其他 agent 路径可后续添加
-  [CODEX]: "codex",
+  codex: "codex",
   // 'qwen-cli': join(homedir(), '.qwen', 'config.json'),
 };
 

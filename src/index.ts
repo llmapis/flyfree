@@ -9,7 +9,9 @@ import { resetCommand } from "./commands/reset.js";
 import { setCommand } from "./commands/set.js";
 import { restoreCommand } from "./commands/restore.js";
 import { registerSkillCommand } from "./commands/skill/index.js";
+import { launchCommand } from "./commands/launch.js";
 import { Logger } from "./utils/logger.js";
+import { AGENT_START_COMMAND } from "./constants/index.js";
 
 // 全局错误处理
 process.on("uncaughtException", (error) => {
@@ -34,7 +36,7 @@ program
   .name("flyfree")
   .alias("ff")
   .description("A CLI tool for managing LLM Provider configurations")
-  .version("0.2.1");
+  .version("0.2.2");
 
 // Subscribe 命令
 program
@@ -93,10 +95,32 @@ program
 // Skill 命令
 registerSkillCommand(program);
 
-// 解析命令行参数
-program.parse(process.argv);
+// 检查是否是 agent 启动命令 (ff codex, ff claude 等)
+const knownCommands = [
+  "sub",
+  "switch",
+  "s",
+  "list",
+  "ls",
+  "unsub",
+  "reset",
+  "set",
+  "restore",
+  "skill",
+];
+const firstArg = process.argv[2];
 
-// 如果没有提供任何命令，显示帮助信息
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+// 如果第一个参数是可启动的 agent 且不在已知命令中，则作为启动命令处理
+if (firstArg && !knownCommands.includes(firstArg) && AGENT_START_COMMAND[firstArg]) {
+  const agentName = firstArg;
+  const agentArgs = process.argv.slice(3);
+  launchCommand(agentName, agentArgs);
+} else {
+  // 解析命令行参数
+  program.parse(process.argv);
+
+  // 如果没有提供任何命令，显示帮助信息
+  if (!process.argv.slice(2).length) {
+    program.outputHelp();
+  }
 }
