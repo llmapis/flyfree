@@ -11,7 +11,7 @@ Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化
 
 [![LLMAPIS](https://llmapis.com/api/badge/llmapis/flyfree)](https://github.com/llmapis/flyfree)
 
-_Friend link with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
+_Partnership with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
 
 ## 使用 Flyfree 前后对比
 

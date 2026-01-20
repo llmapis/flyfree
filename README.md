@@ -11,7 +11,7 @@ Flyfree not only simplifies the steps for users to connect with LLM API provider
 
 [![LLMAPIS](https://llmapis.com/api/badge/llmapis/flyfree)](https://github.com/llmapis/flyfree)
 
-_Friend link with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
+_Partnership link with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
 
 ## Before and After Flyfree
 
