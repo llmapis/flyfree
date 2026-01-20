@@ -9,6 +9,10 @@ English | [简体中文](README.zh-CN.md)
 Flyfree (自由飞翔) helps you easily manage and switch between different LLM provider configurations across multiple AI coding agents. It serves as a bridge between users and LLM platforms, enabling seamless configuration management and rapid platform integration.
 Flyfree not only simplifies the steps for users to connect with LLM API providers, but also simplifies the process for LLM providers to describe integration to users (ordinary users may not need to understand the configuration structure of each Agent).
 
+[![LLMAPIS](https://llmapis.com/api/badge/llmapis/flyfree)](https://github.com/llmapis/flyfree)
+
+_Friend link with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
+
 ## Before and After Flyfree
 
 ### Without Flyfree (Traditional Setup)

@@ -9,6 +9,10 @@
 Flyfree（自由飞翔）帮助您轻松管理和切换多个 AI Agent 的不同 LLM 提供商配置。它充当用户与 LLM 平台之间的桥梁，实现无缝配置管理和快速平台集成。
 Flyfree 不仅简化了用户接入 LLM API 供应商的步骤，同时也简化了 LLM 供应商描向用户描述接入的过程(普通用户或许没必要了解每个 Agent 的配置构成)。
 
+[![LLMAPIS](https://llmapis.com/api/badge/llmapis/flyfree)](https://github.com/llmapis/flyfree)
+
+_Friend link with [llmapis.com](https://llmapis.com) - Discover more AI tools and resources_
+
 ## 使用 Flyfree 前后对比
 
 ### 不使用 Flyfree（传统方式）
